@@ -6,27 +6,11 @@ s.plotTree;
 //step 1 comand/control+enter inside ''a code''
 
 (                     /* a code */
+/* This step creates busses to sent the output of the SynthDefs to the Reverb input  */
 ~reverbBus = Bus.audio(s, 2);
 ~sourceGrp = Group.new;
 ~fxGrp = Group.after(~sourceGrp);
 )
-
-
-
-//step 3 comand/control+enter inside ''play code''
-
-(                                   /* play code */
-{
-	~candy.value;
-}.fork;
-
-{7 do: {
-		{ ~w.value }.fork;
-		15.wait;
-	};
-}.fork;
-)
-
 
 
 
@@ -37,11 +21,7 @@ s.plotTree;
 
 
 ~candy =
-{
-
-
-
-	                       /* REVERB */
+{	                       /* REVERB */
 
 	SynthDef.new(\reverb, {
 	arg in;
@@ -98,12 +78,12 @@ s.plotTree;
 		temp = temp * LFNoise1.kr({Rand(0.5, 8)}!2).exprange(0.01, 1);
 		sum = sum + temp;
 	};
-	env = EnvGen.kr(Env.new([0, 1, 1, 0], [t1, t2, t3]), doneAction:2); // εδώ ορίζω τους χρόνους
+	env = EnvGen.kr(Env.new([0, 1, 1, 0], [t1, t2, t3]), doneAction:2);
 	sum = sum * 0.2 * env*off;
 
 	Out.ar(out, sum);
 		},[5!3]
-	).add; // μέσα στην παρένθεση [..] επιλέγω τον χρόνο που θα γίνει η μετάβαση στα ριθμιστικά
+	).add;
 
 
 
@@ -161,7 +141,6 @@ SynthDef.new(\ufo, {
 	sig = Pan2.ar(sig, LFNoise1.kr(10));
 	Out.ar(out, sig);
 	}).add;
-
 
 
 
@@ -227,11 +206,12 @@ SynthDef.new(\ufo, {
 	b.release(2);
 	//180 sec
 
+
 };
 
 
 
-~w ={
+~crazysynthloop ={
 
 	               /* SYNTHS */
 
@@ -240,9 +220,9 @@ SynthDef.new(\ufo, {
 	*/
 
 SynthDef.new(\crazysynth, {
-	arg plus=1, adsr1=1, adsr2=2, adsr3=3, circle=0.2, out, t1=1, t2=5, t3=3;
+	arg plus=1, attack=1, decay=2, release=3, circle=0.2, out, t1=1, t2=5, t3=3;
 	var sig, env, freq, en;
-	freq = EnvGen.kr(Env.adsr(adsr1,adsr2,adsr3), 200, circle);
+	freq = EnvGen.kr(Env.adsr(attack,decay,release), 200, circle);
 	en = EnvGen.kr(Env.new([0, 1, 1, 0], [t1, t2, t3]), doneAction:2);
 	sig = VarSaw.ar(SinOsc.kr(freq,rrand(0.0,1.0)).range(80+plus, 300+plus)) * 0.4 * en;
 	Out.ar(out, sig!2);
@@ -251,9 +231,9 @@ SynthDef.new(\crazysynth, {
 	rrand(30.0,40.0).wait;
 	d = Synth.new(\crazysynth,
 	[\plus, rrand(100,210),
-		\adsr1, rrand(0.1,1.0),
-		\adsr2, rrand(1.1,2.0),
-		\adsr3, rrand(3.0,3.9),
+		\attack, rrand(0.1,1.0),
+		\decay, rrand(1.1,2.0),
+		\release, rrand(3.0,3.9),
 		\circle, rrand(0.1,2.0),
 		\out, ~reverbBus
 		], ~sourceGrp);
@@ -263,6 +243,19 @@ SynthDef.new(\crazysynth, {
 )
 
 
+//step 3 comand/control+enter inside ''play code''
+
+(                                   /* play code */
+{
+	~candy.value; // this plays the candy code with the time arrangements
+}.fork;
+
+{7 do: { // this loops the crazysynth SynthDef 7 times randomly evry 45 to 55 sec
+		{ ~crazysynthloop.value }.fork;
+		15.wait;
+	};
+}.fork;
+)
 
 
 
