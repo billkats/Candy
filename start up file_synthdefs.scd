@@ -1,3 +1,10 @@
+/*
+1) Before you boot the server, copy all the code from “start up file_synthdefs.scd”.  
+2) Open startup file and paste the code. 
+3) Save and exit.
+4) Start SC and open “Candy.scd”.
+*/
+
 Server.default.waitForBoot({    /* REVERB */
 
 	SynthDef.new(\reverb, {
